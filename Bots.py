@@ -69,7 +69,7 @@ def make_request(url: str, data: str, msisdn: str, step_name: str):
     checksum = generate_checksum(data, SECRET_KEY)  # kept for structure
 
     # ---- TESTING STUB (REPLACED requests.post) ----
- r = requests.post(url, data=data, headers=headers, timeout=15)
+    r = requests.post(url, data=data, headers=headers, timeout=15)
             r.raise_for_status()
             
             json_resp = r.json()
