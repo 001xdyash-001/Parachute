@@ -4,15 +4,15 @@ import random
 import time
 import os
 
-# ===================== CONFIG =====================
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
-CHANNEL_USERNAME = "@YourChannelUsername"
-ADMIN_ID = 123456789
-# =================================================
+# ===================== RENDER CONFIG =====================
+BOT_TOKEN = os.environ.get("BOT_TOKEN")          # REQUIRED
+CHANNEL_USERNAME = os.environ.get("CHANNEL")    # e.g. @mychannel
+ADMIN_ID = int(os.environ.get("ADMIN_ID", "0")) # your telegram id
+# ========================================================
 
-bot = telebot.TeleBot(BOT_TOKEN)
+bot = telebot.TeleBot(BOT_TOKEN, parse_mode="HTML")
 
-# ------------------ DATABASE (Testing) ------------------
+# ------------------ IN-MEMORY DATABASE ------------------
 users = {}
 # users[user_id] = {
 #   "upi": None,
@@ -24,18 +24,19 @@ users = {}
 def is_joined(user_id):
     try:
         status = bot.get_chat_member(CHANNEL_USERNAME, user_id).status
-        return status in ["member", "administrator", "creator"]
+        return status in ("member", "administrator", "creator")
     except:
         return False
 
 
 def random_mobile():
-    return str(random.choice([6,7,8,9])) + str(random.randint(100000000,999999999))
+    return str(random.choice([6, 7, 8, 9])) + str(random.randint(100000000, 999999999))
 
 
 def make_request_testing(step_name, payload):
     """
-    🔴 MIRROR OF make_request() FROM REAL SCRIPT
+    🔁 MIRROR OF REAL API FUNCTION
+    (API REMOVED – TESTING MODE)
     """
     time.sleep(1)
     print("===================================")
@@ -61,14 +62,14 @@ def start(message):
             "referred": False
         }
 
-        # 🔁 MIRROR OF REFERRAL LOGIC
+        # ---------- REFERRAL MIRROR ----------
         if len(args) > 1:
             try:
                 ref_id = int(args[1])
                 if ref_id != user_id and ref_id in users and not users[user_id]["referred"]:
                     users[ref_id]["referrals"] += 1
                     users[user_id]["referred"] = True
-                    bot.send_message(ref_id, "🎉 You got 1 referral!")
+                    bot.send_message(ref_id, "🎉 You received 1 referral!")
             except:
                 pass
 
@@ -78,39 +79,39 @@ def start(message):
             "Join Channel",
             url=f"https://t.me/{CHANNEL_USERNAME[1:]}"
         ))
-        bot.send_message(user_id, "❌ Please join the channel first.", reply_markup=kb)
+        bot.send_message(
+            user_id,
+            "❌ <b>Please join the channel to use this bot.</b>",
+            reply_markup=kb
+        )
         return
 
     bot.send_message(
         user_id,
-        "🤖 Cashback Bot (Testing)\n\n"
-        "Steps:\n"
-        "1️⃣ Refer 1 user\n"
-        "2️⃣ Set UPI\n"
-        "3️⃣ Withdraw\n\n"
-        f"👥 Referrals: {users[user_id]['referrals']}\n\n"
-        f"🔗 Referral Link:\n"
+        f"🤖 <b>Cashback Bot (Testing)</b>\n\n"
+        f"👥 Referrals: <b>{users[user_id]['referrals']}</b>\n\n"
+        f"🔗 <b>Your Referral Link</b>\n"
         f"https://t.me/{bot.get_me().username}?start={user_id}\n\n"
-        "/upi – Set UPI\n"
-        "/withdraw – Withdraw ₹1"
+        f"/upi – Set UPI ID\n"
+        f"/withdraw – Withdraw ₹1"
     )
 
 # ------------------ /upi ------------------
 @bot.message_handler(commands=["upi"])
 def ask_upi(message):
-    msg = bot.send_message(message.chat.id, "💳 Enter your UPI ID:")
+    msg = bot.send_message(message.chat.id, "💳 <b>Send your UPI ID:</b>")
     bot.register_next_step_handler(msg, save_upi)
 
 def save_upi(message):
     user_id = message.from_user.id
     upi = message.text.strip()
 
-    if "@" not in upi:
-        bot.send_message(user_id, "❌ Invalid UPI.")
+    if "@" not in upi or len(upi) < 6:
+        bot.send_message(user_id, "❌ <b>Invalid UPI ID.</b>")
         return
 
     users[user_id]["upi"] = upi
-    bot.send_message(user_id, "✅ UPI saved (Testing)")
+    bot.send_message(user_id, "✅ <b>UPI saved successfully (Testing).</b>")
 
 # ------------------ /withdraw ------------------
 @bot.message_handler(commands=["withdraw"])
@@ -118,71 +119,55 @@ def withdraw(message):
     user_id = message.from_user.id
 
     if not is_joined(user_id):
-        bot.send_message(user_id, "❌ Join channel first.")
+        bot.send_message(user_id, "❌ <b>Please join the channel first.</b>")
         return
 
     if users[user_id]["referrals"] < 1:
-        bot.send_message(user_id, "❌ You need at least 1 referral.")
+        bot.send_message(user_id, "❌ <b>You need at least 1 referral.</b>")
         return
 
     if not users[user_id]["upi"]:
-        bot.send_message(user_id, "❌ Set UPI using /upi.")
+        bot.send_message(user_id, "❌ <b>Please set UPI using /upi.</b>")
         return
 
-    # ================= MIRRORED REAL SCRIPT FLOW =================
-
+    # ========== MIRRORED REAL SCRIPT FLOW ==========
     mobile = random_mobile()
     name = "TestUser"
     email = f"user{random.randint(1000,9999)}@gmail.com"
 
-    # STEP 1 – Create User
-    step1 = make_request_testing(
-        "Create User",
-        {
-            "msisdn": mobile,
-            "firstName": name,
-            "email": email
-        }
-    )
+    make_request_testing("Create User", {
+        "msisdn": mobile,
+        "firstName": name,
+        "email": email
+    })
 
-    # STEP 2 – Submit Answers
-    step2 = make_request_testing(
-        "Submit Answers",
-        {
-            "trivia1": "Once a week",
-            "trivia2": "Coconut"
-        }
-    )
+    make_request_testing("Submit Answers", {
+        "trivia1": "Once a week",
+        "trivia2": "Coconut"
+    })
 
-    # STEP 3 – Save UPI
-    step3 = make_request_testing(
-        "Save UPI",
-        {
-            "vpa": users[user_id]["upi"]
-        }
-    )
+    make_request_testing("Save UPI", {
+        "vpa": users[user_id]["upi"]
+    })
 
-    # STEP 4 – Cashback Redemption
-    step4 = make_request_testing(
-        "Request Cashback",
-        {
-            "redemptionType": "CASHBACK"
-        }
-    )
-
-    # ============================================================
+    make_request_testing("Request Cashback", {
+        "redemptionType": "CASHBACK"
+    })
+    # ==============================================
 
     bot.send_message(
         user_id,
-        "🎉 Withdrawal Successful!\n\n"
+        "🎉 <b>Withdrawal Successful!</b>\n\n"
         "₹1 credited (TESTING MODE)\n"
-        "⚠ No real API was called."
+        "⚠️ No real payment was made."
     )
 
-    bot.send_message(
-        ADMIN_ID,
-        f"💸 Withdraw Request (Testing)\nUser: {user_id}\nUPI: {users[user_id]['upi']}"
-    )
+    if ADMIN_ID:
+        bot.send_message(
+            ADMIN_ID,
+            f"💸 Withdraw Request (Testing)\nUser: {user_id}\nUPI: {users[user_id]['upi']}"
+        )
 
-# ------------------ RUN ------------------
+# ------------------ START BOT ------------------
+print("Bot started (Render mode)")
 bot.infinity_polling(skip_pending=True)
