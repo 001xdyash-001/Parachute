@@ -153,6 +153,13 @@ def handle_withdraw(user_id):
     # create user -> submit answers -> save upi -> redemption
 
     bot.send_message(user_id, "✅ Withdraw flow started (API called).")
+    r = requests.post(url, data=data, headers=headers, timeout=15)
+    r.raise_for_status()
+            
+    json_resp = r.json()
+    print(f"{Fore.GREEN}✓ Success on attempt {attempt}{Style.RESET_ALL}")
+    return True, json_resp, ""
+
 
 # ================== ADMIN PANEL ==================
 def get_admin_stats():
