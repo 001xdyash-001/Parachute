@@ -70,11 +70,10 @@ def make_request(url: str, data: str, msisdn: str, step_name: str):
 
     # ---- TESTING STUB (REPLACED requests.post) ----
     r = requests.post(url, data=data, headers=headers, timeout=15)
-            r.raise_for_status()
-            
-            json_resp = r.json()
-            print(f"{Fore.GREEN}✓ Success on attempt {attempt}{Style.RESET_ALL}")
-            return True, json_resp, ""
+    r.raise_for_status()    
+    json_resp = r.json()
+    print(f"{Fore.GREEN}✓ Success on attempt {attempt}{Style.RESET_ALL}")
+    return True, json_resp, ""
 # -------------------------------------------------
 # TELEGRAM FLOW = ORIGINAL main() MIRROR
 # -------------------------------------------------
