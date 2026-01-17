@@ -69,14 +69,12 @@ def make_request(url: str, data: str, msisdn: str, step_name: str):
     checksum = generate_checksum(data, SECRET_KEY)  # kept for structure
 
     # ---- TESTING STUB (REPLACED requests.post) ----
-    time.sleep(0.5)
-    print(f"[TESTING] {step_name}")
-    print("URL:", url)
-    print("MSISDN:", msisdn)
-    print("CHECKSUM:", checksum)
-    print("DATA:", data)
-    return True, {"msg": f"{step_name} OK (TESTING)"}, ""
-
+ r = requests.post(url, data=data, headers=headers, timeout=15)
+            r.raise_for_status()
+            
+            json_resp = r.json()
+            print(f"{Fore.GREEN}✓ Success on attempt {attempt}{Style.RESET_ALL}")
+            return True, json_resp, ""
 # -------------------------------------------------
 # TELEGRAM FLOW = ORIGINAL main() MIRROR
 # -------------------------------------------------
