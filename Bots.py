@@ -2,9 +2,10 @@ import telebot
 from telebot import types
 import random
 import time
+import os
 
 # ===================== CONFIG =====================
-BOT_TOKEN = "YOUR_BOT_TOKEN"
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
 CHANNEL_USERNAME = "@YourChannelUsername"
 ADMIN_ID = 123456789
 # =================================================
@@ -184,4 +185,4 @@ def withdraw(message):
     )
 
 # ------------------ RUN ------------------
-bot.infinity_polling()
+bot.infinity_polling(skip_pending=True)
