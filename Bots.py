@@ -153,7 +153,7 @@ def callbacks(call):
         )
 
     elif call.data == "reward":
-        if user[2] >= 5:
+        if user[2] >= 1:
             if not user[4]:
                 sql.execute("UPDATE users SET reward_unlocked=1 WHERE user_id=?", (user_id,))
                 db.commit()
@@ -166,7 +166,7 @@ def callbacks(call):
         else:
             bot.send_message(
                 user_id,
-                f"❌ You need {5 - user[2]} more referrals."
+                f"❌ You need {1 - user[2]} more referrals."
             )
 
     elif call.data == "admin_stats" and user_id == ADMIN_ID:
