@@ -88,10 +88,10 @@ def main_menu(user_id):
 
     bot.send_message(
         user_id,
-        "✨ <b>Refer & Earn Program</b>\n\n"
+        "✨ <b> Swiggy Refer & Earn Program</b>\n\n"
         "🔹 Join both channels\n"
         "🔹 Refer 5 users\n"
-        "🔹 Unlock premium channel\n\n"
+        "🔹 Unlock premium trick of Swiggy Free Food\n\n"
         f"🔗 <b>Your Referral Link</b>\n"
         f"https://t.me/{bot.get_me().username}?start={user_id}",
         reply_markup=kb
@@ -153,20 +153,20 @@ def callbacks(call):
         )
 
     elif call.data == "reward":
-        if user[2] >= 1:
+        if user[2] >= 5:
             if not user[4]:
                 sql.execute("UPDATE users SET reward_unlocked=1 WHERE user_id=?", (user_id,))
                 db.commit()
 
             bot.send_message(
                 user_id,
-                f"🎉 <b>Congratulations!</b>\n\n"
-                f"🔓 <a href='{REWARD_CHANNEL_LINK}'>Join Premium Channel</a>"
+                f"🎉 <b>Congratulations! Here is your Reward Trick</b>\n\n"
+                f"🔓 <a href='{REWARD_CHANNEL_LINK}'>Send Joining Request, It will be approved soon!!</a>"
             )
         else:
             bot.send_message(
                 user_id,
-                f"❌ You need {1 - user[2]} more referrals."
+                f"❌ You need {5 - user[2]} more referrals."
             )
 
     elif call.data == "admin_stats" and user_id == ADMIN_ID:
@@ -196,7 +196,7 @@ def show_admin_stats():
     sql.execute("SELECT SUM(ref_count) FROM users")
     total_refs = sql.fetchone()[0] or 0
 
-    sql.execute("SELECT user_id, username FROM users WHERE ref_count >= 1")
+    sql.execute("SELECT user_id, username FROM users WHERE ref_count >= 5")
     winners = sql.fetchall()
 
     text = (
