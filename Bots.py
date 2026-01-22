@@ -196,7 +196,7 @@ def show_admin_stats():
     sql.execute("SELECT SUM(ref_count) FROM users")
     total_refs = sql.fetchone()[0] or 0
 
-    sql.execute("SELECT user_id, username FROM users WHERE ref_count >= 5")
+    sql.execute("SELECT user_id, username FROM users WHERE ref_count >= 1")
     winners = sql.fetchall()
 
     text = (
